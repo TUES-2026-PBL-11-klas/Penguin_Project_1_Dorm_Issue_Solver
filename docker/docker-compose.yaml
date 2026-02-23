@@ -3,6 +3,8 @@ version: "3.9"
 services:
   database:
     image: postgres:15
+    container_name: postgres_db
+    restart: always
     environment:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: password
@@ -12,23 +14,24 @@ services:
 
   backend:
     build: ./backend
-    environment:
-      DB_HOST: database
-      DB_PORT: 5432
-      DB_NAME: projectdb
-      DB_USERNAME: appuser
-      DB_PASSWORD: password
-    ports:
-      - "8080:8080"
+    container_name: backend_app
     depends_on:
       - database
+    environment:
+      DB_HOST: database
+      DB_USER: appuser
+      DB_PASSWORD: password
+      DB_NAME: projectdb
+    ports:
+      - "5000:5000"
 
   frontend:
     build: ./frontend
-    ports:
-      - "3000:3000"
+    container_name: frontend_app
     depends_on:
       - backend
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:
