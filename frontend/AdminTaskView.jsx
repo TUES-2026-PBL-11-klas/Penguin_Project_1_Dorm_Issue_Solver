@@ -1,13 +1,19 @@
 import { useState } from "react";
-import WavyBackground from "../../components/WavyBackground";
-import Navbar from "../../components/Navbar";
+import WavyBackground from "./WavyBackground";
+import Navbar from "./Navbar";
+import { useApp } from "./AppContext";
 import "./AdminTaskView.css";
 
 const STATUS_OPTIONS = ["NOT STARTED", "IN PROGRESS", "FINISHED"];
 
-export default function AdminTaskView({ onNavigate }) {
-  const [status, setStatus] = useState("NOT STARTED");
+export default function AdminTaskView({ onNavigate, taskId }) {
+  const { tasks, updateTaskStatus } = useApp();
+  const task = tasks.find(t => t.id === taskId) || tasks[0];
   const [showDropdown, setShowDropdown] = useState(false);
+
+  if (!task) return <div style={{ color: "#fff", padding: 40 }}>Task not found.</div>;
+
+  const btnClass = task.status === "IN PROGRESS" ? "yellow" : task.status === "FINISHED" ? "green" : "red";
 
   return (
     <div className="page">
@@ -16,54 +22,53 @@ export default function AdminTaskView({ onNavigate }) {
 
       <div className="task-body">
         <div className="task-top">
-          {/* Image card */}
+          {/* Image */}
           <div className="card image-card">
             <div className="task-card-title">Image</div>
-            <div className="image-placeholder" />
+            {task.photo
+              ? <img src={task.photo} alt="report" className="report-image" />
+              : <div className="image-placeholder" />
+            }
           </div>
 
-          {/* Info card */}
+          {/* Info */}
           <div className="card info-card">
             <div className="task-card-title">Info about report</div>
-            <div className="info-row">Reported by: <strong>username</strong></div>
-            <div className="info-row">Reported at: <strong>00:00</strong></div>
-            <div className="info-row">Priority: <strong>Normal</strong></div>
+            <div className="info-row">Report: <strong>{task.name}</strong></div>
+            <div className="info-row">Reported by: <strong>{task.reportedBy}</strong></div>
+            <div className="info-row">Reported at: <strong>{task.reportedAt}</strong></div>
+            <div className="info-row">Priority: <strong>{task.priority}</strong></div>
 
-            <div className="status-selector" style={{ position: "relative" }}>
+            <div className="status-selector">
               <span className="status-label-text">Set status of report</span>
-              <button
-                className={`status-dropdown-btn ${status === "NOT STARTED" ? "red" : status === "IN PROGRESS" ? "yellow" : "green"}`}
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
-                ✓ {status} ▾
-              </button>
-              {showDropdown && (
-                <div className="dropdown-menu">
-                  {STATUS_OPTIONS.map((opt) => (
-                    <div
-                      key={opt}
-                      className="dropdown-item"
-                      onClick={() => { setStatus(opt); setShowDropdown(false); }}
-                    >
-                      {opt}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div style={{ position: "relative" }}>
+                <button className={`status-dropdown-btn ${btnClass}`} onClick={() => setShowDropdown(!showDropdown)}>
+                  ✓ {task.status} ▾
+                </button>
+                {showDropdown && (
+                  <div className="dropdown-menu">
+                    {STATUS_OPTIONS.map(opt => (
+                      <div key={opt} className="dropdown-item" onClick={() => { updateTaskStatus(task.id, opt); setShowDropdown(false); }}>
+                        {opt}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="or-divider">or</div>
 
-            <button className="mark-finished-btn" onClick={() => setStatus("FINISHED")}>
+            <button className="mark-finished-btn" onClick={() => updateTaskStatus(task.id, "FINISHED")}>
               MARK REPORT AS FINISHED
             </button>
           </div>
         </div>
 
-        {/* Description card */}
+        {/* Description */}
         <div className="card desc-card">
           <div className="task-card-title">Description</div>
-          <p className="desc-text">Bleblublublubla</p>
+          <p className="desc-text">{task.description || "No description provided."}</p>
         </div>
       </div>
     </div>

@@ -1,47 +1,39 @@
 import { useState } from "react";
-import WavyBackground from "../../components/WavyBackground";
-import AvatarIcon from "../../components/AvatarIcon";
+import WavyBackground from "./WavyBackground";
+import AvatarIcon from "./AvatarIcon";
+import { useApp } from "./AppContext";
 import "./LogIn.css";
 
 export default function LogIn({ onNavigate }) {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const { setRole, setUser } = useApp();
+  const [form, setForm]           = useState({ username: "", password: "" });
+  const [selectedRole, setSelectedRole] = useState("student");
+
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleLogin = () => {
+    setRole(selectedRole);
+    setUser(form.username || (selectedRole === "admin" ? "Admin" : "Student"));
+    onNavigate("dashboard");
+  };
 
   return (
     <div className="page login-page">
       <WavyBackground />
-
       <div className="card login-card">
         <h1 className="login-title">Log In</h1>
-
-        <div className="login-avatar">
-          <AvatarIcon size={60} />
-        </div>
-
+        <div className="login-avatar"><AvatarIcon size={60} /></div>
         <div className="login-fields">
-          <input
-            className="login-input"
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
-            onChange={onChange}
-          />
-          <input
-            className="login-input"
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={onChange}
-          />
+          <input className="login-input" type="text" name="username" placeholder="Username" value={form.username} onChange={onChange} />
+          <input className="login-input" type="password" name="password" placeholder="Password" value={form.password} onChange={onChange} />
         </div>
-
-        <button className="login-btn" onClick={() => onNavigate("adminDashboard")}>
-          LOG IN
-        </button>
+        <div className="role-toggle">
+          <button className={`role-btn ${selectedRole === "admin" ? "active" : ""}`} onClick={() => setSelectedRole("admin")}>Administrator</button>
+          <button className={`role-btn ${selectedRole === "student" ? "active" : ""}`} onClick={() => setSelectedRole("student")}>Student</button>
+        </div>
+        <button className="login-submit-btn" onClick={handleLogin}>LOG IN</button>
+        <p className="auth-switch">Don't have an account? <span onClick={() => onNavigate("signup")}>Sign up</span></p>
       </div>
-
       <p className="page-name">Name</p>
     </div>
   );

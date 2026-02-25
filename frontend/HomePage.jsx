@@ -1,5 +1,5 @@
-import WavyBackground from "../../components/WavyBackground";
-import Navbar from "../../components/Navbar";
+import WavyBackground from "./WavyBackground";
+import Navbar from "./Navbar";
 import "./HomePage.css";
 
 export default function HomePage({ onNavigate }) {
@@ -11,7 +11,7 @@ export default function HomePage({ onNavigate }) {
         <h1 className="home-name">Name</h1>
         <h2 className="home-slogan">SLOGAN</h2>
         <p className="home-desc">Short Description Of Product</p>
-        <button className="home-btn" onClick={() => onNavigate("signup")}>
+        <button className="home-btn" onClick={() => onNavigate("login")}>
           LEARN MORE
         </button>
       </div>

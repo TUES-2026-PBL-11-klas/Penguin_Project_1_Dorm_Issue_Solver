@@ -4,7 +4,7 @@ export default function Navbar({ activePage, onNavigate, homeNav = false }) {
   if (homeNav) {
     return (
       <nav className="navbar">
-        <div className="navbar-logo">LOGO</div>
+        <div className="navbar-logo" onClick={() => onNavigate("home")}>LOGO</div>
         <ul className="navbar-links">
           <li onClick={() => onNavigate("about")}>ABOUT US</li>
           <li className={activePage === "login" ? "active" : ""} onClick={() => onNavigate("login")}>LOG IN</li>
@@ -17,15 +17,10 @@ export default function Navbar({ activePage, onNavigate, homeNav = false }) {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">LOGO</div>
+      <div className="navbar-logo" onClick={() => onNavigate("home")}>LOGO</div>
       <ul className="navbar-links">
         <li onClick={() => onNavigate("about")}>ABOUT US</li>
-        <li
-          className={activePage === "dashboard" ? "active" : ""}
-          onClick={() => onNavigate("adminDashboard")}
-        >
-          DASHBOARD
-        </li>
+        <li className={activePage === "dashboard" ? "active" : ""} onClick={() => onNavigate("dashboard")}>DASHBOARD</li>
         <li onClick={() => onNavigate("home")}>HOME PAGE</li>
         <li onClick={() => onNavigate("contact")}>CONTACT</li>
       </ul>
