@@ -14,8 +14,17 @@ public class Incident {
 
     private String title;
     private String description;
+    private String location;
+    private String status; // "Изчакване", "В процес", "Решен"
+    private java.time.LocalDateTime createdAt;
+
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name = "user_id")
+    private User user;
 
     public Incident() {
+        this.status = "Изчакване";
+        this.createdAt = java.time.LocalDateTime.now();
     }
 
     public Long getId() {
@@ -36,5 +45,37 @@ public class Incident {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
