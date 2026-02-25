@@ -1,0 +1,377 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────
+   Page
+───────────────────────────────────────── */
+.db-page {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: 'Mulish', sans-serif;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  /* Focused background from public/ */
+  background-image: url('/Focused_bg.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* ─────────────────────────────────────────
+   Navbar
+───────────────────────────────────────── */
+.db-nav {
+  display: flex;
+  align-items: center;
+  padding: 0 80px;
+  height: 80px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.db-nav-logo {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.db-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  margin-left: auto;
+}
+
+.db-nav-link {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.db-nav-link:hover {
+  opacity: 0.7;
+}
+
+/* Active nav link — bold for current page */
+.db-nav-link--active {
+  font-weight: 800;
+}
+
+/* ─────────────────────────────────────────
+   Main layout
+───────────────────────────────────────── */
+.db-main {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  padding: 0 80px;
+  flex: 1;
+  overflow: hidden;
+  align-items: flex-start;
+}
+
+/* ─────────────────────────────────────────
+   Profile card (left)
+───────────────────────────────────────── */
+.db-profile-card {
+  background: #ffffff;
+  border-radius: 12.5px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 24px;
+  overflow: hidden;
+  height: 100%;
+  max-height: 620px;
+}
+
+.db-profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #9709a2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e8e8;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.db-profile-username {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #000000;
+  text-transform: capitalize;
+  line-height: 1;
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+.db-profile-role {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #979797;
+  text-transform: capitalize;
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.db-profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  width: 100%;
+}
+
+.db-profile-detail {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #424242;
+  text-transform: capitalize;
+  text-align: center;
+  margin: 0;
+}
+
+/* Action button — "Make a New Report" (student) or "View All Reports" (admin) */
+.db-action-btn {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(to right, #9709a2, #8800a6);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  margin-top: 28px;
+  transition: opacity 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.db-action-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.db-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* ─────────────────────────────────────────
+   Reports statistics panel (right)
+───────────────────────────────────────── */
+.db-reports-panel {
+  background: #ffffff;
+  border-radius: 12.5px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  overflow-y: auto;
+  max-height: 620px;
+}
+
+.db-reports-title {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  color: #000000;
+  text-transform: capitalize;
+  line-height: 1;
+  margin: 0;
+}
+
+.db-reports-subtitle {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #797979;
+  margin: 8px 0 0;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+/* ─────────────────────────────────────────
+   Stat boxes row
+───────────────────────────────────────── */
+.db-stats-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.db-stat-box {
+  flex: 1;
+  border-radius: 12.5px;
+  border-width: 3px;
+  border-style: solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px 12px;
+  gap: 4px;
+}
+
+.db-stat-box--red    { border-color: #dd7f7f; }
+.db-stat-box--yellow { border-color: #fff082; }
+.db-stat-box--green  { border-color: #7fd688; }
+
+.db-stat-number {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  color: #000000;
+  line-height: 1;
+}
+
+.db-stat-label {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #000000;
+  text-transform: capitalize;
+  line-height: 1;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────
+   Report rows
+───────────────────────────────────────── */
+.db-report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.db-report-row {
+  display: flex;
+  align-items: center;
+  border: 2px solid #9709a2;
+  border-radius: 10px;
+  padding: 0 16px;
+  height: 60px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  outline: none;
+}
+
+.db-report-row:hover,
+.db-report-row:focus {
+  background: rgba(151, 9, 162, 0.04);
+}
+
+.db-report-name {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #000000;
+  text-transform: capitalize;
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* Shared badge base */
+.db-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 14px;
+  height: 30px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.db-badge--priority { min-width: 75px;  }
+.db-badge--status   { min-width: 105px; }
+
+/* ─────────────────────────────────────────
+   Footer
+───────────────────────────────────────── */
+.db-footer-name {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #ffffff;
+  text-transform: capitalize;
+  text-align: center;
+  padding: 10px 0 12px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+/* ─────────────────────────────────────────
+   Responsive
+───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .db-nav {
+    padding: 0 24px;
+  }
+
+  .db-nav-links {
+    gap: 20px;
+  }
+
+  .db-nav-link {
+    font-size: 11px;
+  }
+
+  .db-main {
+    flex-direction: column;
+    padding: 0 16px;
+    overflow-y: auto;
+  }
+
+  .db-profile-card {
+    width: 100%;
+    max-height: none;
+  }
+
+  .db-reports-panel {
+    max-height: none;
+    width: 100%;
+  }
+
+  .db-report-name {
+    font-size: 15px;
+  }
+}
