@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.homepage {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: 'Mulish', sans-serif;
+
+  /* ── Background image ── */
+  background-image: url('/Focused_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ─── Navigation ─── */
+.nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 52px 80px;
+  z-index: 10;
+}
+
+.nav-logo {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 22.648px;
+  color: #fff;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 100px;
+  margin-left: auto;
+}
+
+.nav-link {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 17.525px;
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+  opacity: 0.75;
+}
+
+/* ─── Hero Section ─── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 130px);
+  text-align: center;
+  padding: 0 20px;
+  z-index: 10;
+  position: relative;
+}
+
+.hero-name {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 94.444px;
+  color: #fff;
+  line-height: 0.9;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.hero-slogan {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 52.778px;
+  color: #fff;
+  line-height: 0.87;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-top: 22px;
+}
+
+.hero-description {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 17.525px;
+  color: #ae5cc5;
+  line-height: 1.4;
+  text-transform: capitalize;
+  margin-top: 18px;
+}
+
+/* ─── CTA Button ─── */
+.cta-button {
+  margin-top: 38px;
+  width: 206px;
+  height: 61px;
+  background: linear-gradient(to right, #9709a2, #8800a6);
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.cta-button:hover {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.cta-button span {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 21.32px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .nav {
+    padding: 32px 32px;
+  }
+
+  .nav-links {
+    gap: 32px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
+
+  .hero-name {
+    font-size: 60px;
+  }
+
+  .hero-slogan {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hero-name {
+    font-size: 44px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .hero-slogan {
+    font-size: 26px;
+    white-space: normal;
+  }
+}

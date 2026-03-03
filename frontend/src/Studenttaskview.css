@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────
+   Page
+───────────────────────────────────────── */
+.stv-page {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: 'Mulish', sans-serif;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  /* Focused background from public/ */
+  background-image: url('/Focused_bg.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* ─────────────────────────────────────────
+   Navbar
+───────────────────────────────────────── */
+.stv-nav {
+  display: flex;
+  align-items: center;
+  padding: 0 75px;
+  height: 80px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.stv-nav-logo {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.stv-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  margin-left: auto;
+}
+
+.stv-nav-link {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.stv-nav-link:hover {
+  opacity: 0.7;
+}
+
+/* ─────────────────────────────────────────
+   Main
+───────────────────────────────────────── */
+.stv-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 75px 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ─────────────────────────────────────────
+   Top row
+───────────────────────────────────────── */
+.stv-top-row {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+}
+
+/* ─────────────────────────────────────────
+   Shared card base
+───────────────────────────────────────── */
+.stv-card {
+  background: #ffffff;
+  border-radius: 12.5px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  overflow: visible;
+  padding: 24px 24px 28px;
+}
+
+.stv-card-title {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: #000000;
+  text-transform: capitalize;
+  line-height: 1;
+  margin: 0 0 16px;
+}
+
+/* ─────────────────────────────────────────
+   Image card (left, ~55%)
+───────────────────────────────────────── */
+.stv-image-card {
+  flex: 1.5;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Clickable image upload area */
+.stv-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d9d9;
+  border-radius: 12.5px;
+  height: 260px;
+  width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.stv-image-placeholder:hover {
+  background: #cccccc;
+}
+
+.stv-image-hint {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #888888;
+  text-transform: capitalize;
+  pointer-events: none;
+}
+
+.stv-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12.5px;
+}
+
+/* Hidden real file input */
+.stv-image-input {
+  display: none;
+}
+
+/* ─────────────────────────────────────────
+   Form card (right, ~40%)
+───────────────────────────────────────── */
+.stv-form-card {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─────────────────────────────────────────
+   Report name input
+───────────────────────────────────────── */
+.stv-input {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #9709a2 !important;
+  background: #ffffff !important;
+  outline: none;
+  padding: 0 14px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #000000;
+  border-radius: 0 !important;
+  box-shadow: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 16px;
+}
+
+.stv-input::placeholder {
+  color: #8d8d8d;
+  text-transform: capitalize;
+}
+
+.stv-input:focus {
+  border-color: #6a0080 !important;
+  box-shadow: 0 0 0 2px rgba(151, 9, 162, 0.12);
+}
+
+/* ─────────────────────────────────────────
+   Priority selector
+───────────────────────────────────────── */
+.stv-priority-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.stv-priority-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 50px;
+  border: 1px solid #9709a2;
+  background: #ffffff;
+  padding: 0 12px 0 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+
+.stv-priority-select:hover {
+  border-color: #6a0080;
+}
+
+.stv-priority-placeholder {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #8d8d8d;
+  text-transform: capitalize;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.stv-priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 50px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 12px;
+  height: 30px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.stv-priority-chevron {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Priority dropdown */
+.stv-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #9709a2;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.stv-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.stv-dropdown-item:hover {
+  background: rgba(151, 9, 162, 0.06);
+}
+
+.stv-dropdown-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 14px;
+  height: 28px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   Make report button
+───────────────────────────────────────── */
+.stv-submit-btn {
+  width: 100%;
+  height: 46px;
+  background: linear-gradient(to right, #9709a2, #8800a6);
+  border-radius: 12.5px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin-top: auto;
+  transition: opacity 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.stv-submit-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: scale(1.02);
+}
+
+.stv-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.stv-submit-btn:disabled:not(.stv-submit-btn--done) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stv-submit-btn--done {
+  background: linear-gradient(to right, #00b432, #009928) !important;
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* ─────────────────────────────────────────
+   Description card (full width)
+───────────────────────────────────────── */
+.stv-description-card {
+  width: 100%;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.stv-description-textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #9709a2 !important;
+  background: #ffffff !important;
+  outline: none;
+  padding: 10px 14px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #424242;
+  border-radius: 0 !important;
+  box-shadow: none;
+  box-sizing: border-box;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-transform: capitalize;
+}
+
+.stv-description-textarea::placeholder {
+  color: #8d8d8d;
+  text-transform: capitalize;
+}
+
+.stv-description-textarea:focus {
+  border-color: #6a0080 !important;
+  box-shadow: 0 0 0 2px rgba(151, 9, 162, 0.12);
+}
+
+/* ─────────────────────────────────────────
+   Responsive
+───────────────────────────────────────── */
+@media (max-width: 860px) {
+  .stv-nav {
+    padding: 0 20px;
+  }
+
+  .stv-nav-links {
+    gap: 18px;
+  }
+
+  .stv-nav-link {
+    font-size: 12px;
+  }
+
+  .stv-main {
+    padding: 0 16px 16px;
+    overflow-y: auto;
+  }
+
+  .stv-top-row {
+    flex-direction: column;
+  }
+
+  .stv-image-card,
+  .stv-form-card {
+    flex: none;
+    width: 100%;
+  }
+
+  .stv-image-placeholder {
+    height: 200px;
+  }
+}

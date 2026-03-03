@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppProvider } from "./AppContext";
-import "./global.css";
+import "./Global.css";
 
 import HomePage        from "./HomePage";
 import LogIn           from "./LogIn";

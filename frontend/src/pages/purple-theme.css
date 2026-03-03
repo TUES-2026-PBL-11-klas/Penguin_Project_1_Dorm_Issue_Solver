@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.purple-bg {
+  background-image: url('../assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.nav-link-custom {
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.nav-link-custom:hover {
+  background: rgba(50, 0, 80, 0.7);
+  padding: 6px 16px;
+  border-radius: 6px;
+  opacity: 1;
+}
+
+.nav-link-active {
+  background: rgba(50, 0, 80, 0.7);
+  padding: 6px 16px;
+  border-radius: 6px;
+}
+
+.btn-purple-outline {
+  background: rgba(255,255,255,0.15);
+  border: 2px solid white;
+  color: white;
+  padding: 12px 40px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-purple-outline:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.card-white {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.badge-high {
+  background: #9b00d9;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-normal {
+  background: #b366d9;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-low {
+  background: #4a0080;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-inprogress {
+  background: #f0d000;
+  color: black;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-notstarted {
+  background: #e8a0a0;
+  color: #800000;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-finished {
+  background: #00c853;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.btn-purple {
+  background: #6a00a8;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+}
+
+.btn-purple:hover {
+  background: #9b00d9;
+}
