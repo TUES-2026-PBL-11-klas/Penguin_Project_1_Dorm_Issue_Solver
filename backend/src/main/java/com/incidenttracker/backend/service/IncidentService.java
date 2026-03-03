@@ -1,96 +1,80 @@
-// service/IncidentService.java
 package com.incidenttracker.backend.service;
 
-import com.incidenttracker.backend.dto.*;
-import com.incidenttracker.backend.model.Incident;
-import com.incidenttracker.backend.model.enums.Status;
-import com.incidenttracker.backend.repository.IncidentRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.nio.file.*;
-import java.time.LocalDateTime;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service // Казваме на Spring, че това е service компонент
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.incidenttracker.backend.dto.DashboardStatsResponse;
+import com.incidenttracker.backend.dto.IncidentCreateRequest;
+import com.incidenttracker.backend.dto.IncidentResponse;
+import com.incidenttracker.backend.model.Incident;
+import com.incidenttracker.backend.model.User;
+import com.incidenttracker.backend.model.enums.Status;
+import com.incidenttracker.backend.repository.IncidentRepository;
+
+@Service
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
 
-    // Constructor injection – по-добра практика от @Autowired директно в полето
     public IncidentService(IncidentRepository incidentRepository) {
         this.incidentRepository = incidentRepository;
     }
 
-    // Създаване на инцидент
     public IncidentResponse createIncident(IncidentCreateRequest request,
                                            MultipartFile image,
-                                           Long studentId,
-                                           String studentName) throws IOException {
+                                           User user) throws IOException {
         Incident incident = new Incident();
         incident.setTitle(request.getTitle());
         incident.setDescription(request.getDescription());
         incident.setPriority(request.getPriority());
-        incident.setStatus(Status.NOT_STARTED); // винаги започва като NOT_STARTED
-        incident.setCreatedAt(LocalDateTime.now());
-        incident.setStudentId(studentId);
-        incident.setStudentName(studentName);
+        incident.setUser(user); // директно слагаме User обекта
 
-        // Обработка на снимката
         if (image != null && !image.isEmpty()) {
-            String imageUrl = saveImage(image);
-            incident.setImageUrl(imageUrl);
+            incident.setImageUrl(saveImage(image));
         }
 
-        Incident saved = incidentRepository.save(incident);
-        return IncidentResponse.fromIncident(saved);
+        return IncidentResponse.fromIncident(incidentRepository.save(incident));
     }
 
-    // Запис на снимката на диска
     private String saveImage(MultipartFile image) throws IOException {
-        // Създаваме уникално име за файла за да избегнем конфликти
         String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
         Path uploadDir = Paths.get("uploads");
-
-        // Създаваме папката ако не съществува
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
-        }
-
-        Path filePath = uploadDir.resolve(filename);
-        Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return "/uploads/" + filename; // връщаме URL пътя
+        if (!Files.exists(uploadDir)) Files.createDirectories(uploadDir);
+        Files.copy(image.getInputStream(), uploadDir.resolve(filename),
+                StandardCopyOption.REPLACE_EXISTING);
+        return "/uploads/" + filename;
     }
 
-    // Всички инциденти на даден студент (сортирани по приоритет)
-    public List<IncidentResponse> getStudentIncidents(Long studentId) {
-        return incidentRepository.findByStudentIdOrderByPriorityAsc(studentId)
+    public List<IncidentResponse> getStudentIncidents(String username) {
+        return incidentRepository.findByUserUsernameOrderByPriorityAsc(username)
                 .stream()
-                .map(IncidentResponse::fromIncident) // конвертираме всеки Incident → IncidentResponse
+                .map(IncidentResponse::fromIncident)
                 .collect(Collectors.toList());
     }
 
-    // Детайли за конкретен инцидент
     public IncidentResponse getIncidentById(Long id) {
         Incident incident = incidentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incident not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Инцидентът не е намерен: " + id));
         return IncidentResponse.fromIncident(incident);
     }
 
-    // Статистика за студент dashboard
-    public DashboardStatsResponse getStudentStats(Long studentId) {
-        long notStarted = incidentRepository.countByStudentIdAndStatus(studentId, Status.NOT_STARTED);
-        long inProgress = incidentRepository.countByStudentIdAndStatus(studentId, Status.IN_PROGRESS);
-        long finished = incidentRepository.countByStudentIdAndStatus(studentId, Status.FINISHED);
-        long total = notStarted + inProgress + finished;
-        return new DashboardStatsResponse(total, notStarted, inProgress, finished);
+    public DashboardStatsResponse getStudentStats(String username) {
+        long notStarted = incidentRepository.countByUserUsernameAndStatus(username, Status.NOT_STARTED);
+        long inProgress = incidentRepository.countByUserUsernameAndStatus(username, Status.IN_PROGRESS);
+        long finished   = incidentRepository.countByUserUsernameAndStatus(username, Status.FINISHED);
+        return new DashboardStatsResponse(notStarted + inProgress + finished,
+                                          notStarted, inProgress, finished);
     }
 
-    // Всички инциденти (за admin)
     public List<IncidentResponse> getAllIncidents() {
         return incidentRepository.findAllByOrderByPriorityAsc()
                 .stream()
@@ -98,21 +82,18 @@ public class IncidentService {
                 .collect(Collectors.toList());
     }
 
-    // Статистика за admin dashboard
     public DashboardStatsResponse getAdminStats() {
         long notStarted = incidentRepository.countByStatus(Status.NOT_STARTED);
         long inProgress = incidentRepository.countByStatus(Status.IN_PROGRESS);
-        long finished = incidentRepository.countByStatus(Status.FINISHED);
-        long total = notStarted + inProgress + finished;
-        return new DashboardStatsResponse(total, notStarted, inProgress, finished);
+        long finished   = incidentRepository.countByStatus(Status.FINISHED);
+        return new DashboardStatsResponse(notStarted + inProgress + finished,
+                                          notStarted, inProgress, finished);
     }
 
-    // Промяна на статус (само admin)
     public IncidentResponse updateStatus(Long id, Status newStatus) {
         Incident incident = incidentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incident not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Инцидентът не е намерен: " + id));
         incident.setStatus(newStatus);
-        Incident updated = incidentRepository.save(incident);
-        return IncidentResponse.fromIncident(updated);
+        return IncidentResponse.fromIncident(incidentRepository.save(incident));
     }
 }

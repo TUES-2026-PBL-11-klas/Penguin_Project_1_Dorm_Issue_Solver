@@ -12,6 +12,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,7 +21,7 @@ import jakarta.persistence.Table;
 public class Incident {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -28,7 +30,7 @@ public class Incident {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Enumerated(EnumType.STRING) // пазим "HIGH", не 0/1/2
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Priority priority;
 
@@ -37,21 +39,20 @@ public class Incident {
     private Status status;
 
     @Column(name = "image_url")
-    private String imageUrl; // пазим пътя/URL на снимката
+    private String imageUrl;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // Връзка към потребителя - другият backend разработчик ще направи User модела.
-    // Засега пазим само ID-то на студента.
-    @Column(name = "student_id", nullable = false)
-    private Long studentId;
+    // Връзката с User - неговото решение е правилно тук
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "student_name")
-    private String studentName; // за показване в admin view
-
-    // Конструктори
-    public Incident() {}
+    public Incident() {
+        this.status = Status.NOT_STARTED;
+        this.createdAt = LocalDateTime.now();
+    }
 
     // Getters и Setters
     public Long getId() { return id; }
@@ -75,9 +76,6 @@ public class Incident {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public Long getStudentId() { return studentId; }
-    public void setStudentId(Long studentId) { this.studentId = studentId; }
-
-    public String getStudentName() { return studentName; }
-    public void setStudentName(String studentName) { this.studentName = studentName; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

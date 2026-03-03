@@ -29,8 +29,11 @@ public class IncidentResponse {
         response.status = incident.getStatus();
         response.imageUrl = incident.getImageUrl();
         response.createdAt = incident.getCreatedAt();
-        response.studentId = incident.getStudentId();
-        response.studentName = incident.getStudentName();
+        // вземаме данните от User обекта
+        if (incident.getUser() != null) {
+            response.studentId = incident.getUser().getId();
+            response.studentName = incident.getUser().getUsername();
+        }
         return response;
     }
 

@@ -1,27 +1,25 @@
-// repository/IncidentRepository.java
 package com.incidenttracker.backend.repository;
 
-import com.incidenttracker.backend.model.Incident;
-import com.incidenttracker.backend.model.enums.Priority;
-import com.incidenttracker.backend.model.enums.Status;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.incidenttracker.backend.model.Incident;
+import com.incidenttracker.backend.model.enums.Status;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
 
-    // Намери всички инциденти на даден студент, сортирани по приоритет
-    // Spring разбира от името на метода какъв SQL да напише!
-    List<Incident> findByStudentIdOrderByPriorityAsc(Long studentId);
+    // Намери инциденти по username на студента, сортирани по приоритет
+    List<Incident> findByUserUsernameOrderByPriorityAsc(String username);
 
-    // За статистики – брой по статус за даден студент
-    long countByStudentIdAndStatus(Long studentId, Status status);
+    // Статистики за конкретен студент
+    long countByUserUsernameAndStatus(String username, Status status);
 
-    // За статистики – брой по статус (за admin – всички)
+    // Статистики за всички (admin)
     long countByStatus(Status status);
 
-    // За admin – всички инциденти
+    // Всички инциденти сортирани (admin)
     List<Incident> findAllByOrderByPriorityAsc();
 }

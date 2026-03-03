@@ -1,87 +1,103 @@
-// controller/IncidentController.java
 package com.incidenttracker.backend.controller;
-
-import com.incidenttracker.backend.dto.*;
-import com.incidenttracker.backend.model.enums.Priority;
-import com.incidenttracker.backend.model.enums.Status;
-import com.incidenttracker.backend.service.IncidentService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
-@RestController // Казва на Spring: тази класа обработва HTTP заявки и връща JSON
-@RequestMapping("/api/incidents") // базовия URL за всички endpoints в този контролер
-@CrossOrigin(origins = "*") // Позволява заявки от frontend (React) – важно!
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.incidenttracker.backend.dto.DashboardStatsResponse;
+import com.incidenttracker.backend.dto.IncidentCreateRequest;
+import com.incidenttracker.backend.dto.IncidentResponse;
+import com.incidenttracker.backend.model.User;
+import com.incidenttracker.backend.model.enums.Priority;
+import com.incidenttracker.backend.model.enums.Status;
+import com.incidenttracker.backend.repository.UserRepository;
+import com.incidenttracker.backend.service.IncidentService;
+
+@RestController
+@RequestMapping("/api/incidents")
+@CrossOrigin(origins = "*")
 public class IncidentController {
 
     private final IncidentService incidentService;
+    private final UserRepository userRepository;
 
-    public IncidentController(IncidentService incidentService) {
+    public IncidentController(IncidentService incidentService,
+                               UserRepository userRepository) {
         this.incidentService = incidentService;
+        this.userRepository = userRepository;
     }
 
-    // POST /api/incidents
-    // Студент създава нов инцидент
-    // Използваме @RequestParam защото изпращаме multipart/form-data (заради снимката)
+    // Помощен метод – взима логнатия User обект от базата
+    private User getAuthenticatedUser(Authentication authentication) {
+        return userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Потребителят не е намерен"));
+    }
+
+    // POST /api/incidents – студент създава инцидент
     @PostMapping
     public ResponseEntity<IncidentResponse> createIncident(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("priority") Priority priority,
             @RequestParam(value = "image", required = false) MultipartFile image,
-            @RequestParam("studentId") Long studentId,       // временно – после идва от JWT token
-            @RequestParam("studentName") String studentName  // временно – после идва от JWT token
+            Authentication authentication
     ) throws IOException {
+        User user = getAuthenticatedUser(authentication);
 
         IncidentCreateRequest request = new IncidentCreateRequest();
         request.setTitle(title);
         request.setDescription(description);
         request.setPriority(priority);
 
-        IncidentResponse response = incidentService.createIncident(request, image, studentId, studentName);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(incidentService.createIncident(request, image, user));
     }
 
-    // GET /api/incidents/student/{studentId}
-    // Всички инциденти на конкретен студент
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<IncidentResponse>> getStudentIncidents(@PathVariable Long studentId) {
-        return ResponseEntity.ok(incidentService.getStudentIncidents(studentId));
+    // GET /api/incidents/my – инцидентите на логнатия студент
+    @GetMapping("/my")
+    public ResponseEntity<List<IncidentResponse>> getMyIncidents(Authentication authentication) {
+        return ResponseEntity.ok(
+            incidentService.getStudentIncidents(authentication.getName())
+        );
     }
 
-    // GET /api/incidents/student/{studentId}/stats
-    // Статистика за student dashboard
-    @GetMapping("/student/{studentId}/stats")
-    public ResponseEntity<DashboardStatsResponse> getStudentStats(@PathVariable Long studentId) {
-        return ResponseEntity.ok(incidentService.getStudentStats(studentId));
+    // GET /api/incidents/my/stats – статистика за student dashboard
+    @GetMapping("/my/stats")
+    public ResponseEntity<DashboardStatsResponse> getMyStats(Authentication authentication) {
+        return ResponseEntity.ok(
+            incidentService.getStudentStats(authentication.getName())
+        );
     }
 
-    // GET /api/incidents/{id}
-    // Детайли за конкретен инцидент (student или admin)
+    // GET /api/incidents/{id} – детайли за инцидент
     @GetMapping("/{id}")
     public ResponseEntity<IncidentResponse> getIncidentById(@PathVariable Long id) {
         return ResponseEntity.ok(incidentService.getIncidentById(id));
     }
 
-    // GET /api/incidents/admin/all
-    // Всички инциденти (само за admin)
+    // GET /api/incidents/admin/all – всички инциденти (admin)
     @GetMapping("/admin/all")
     public ResponseEntity<List<IncidentResponse>> getAllIncidents() {
         return ResponseEntity.ok(incidentService.getAllIncidents());
     }
 
-    // GET /api/incidents/admin/stats
-    // Статистика за admin dashboard
+    // GET /api/incidents/admin/stats – статистика (admin)
     @GetMapping("/admin/stats")
     public ResponseEntity<DashboardStatsResponse> getAdminStats() {
         return ResponseEntity.ok(incidentService.getAdminStats());
     }
 
-    // PATCH /api/incidents/{id}/status
-    // Admin променя статус на инцидент
+    // PATCH /api/incidents/{id}/status – admin сменя статус
     @PatchMapping("/{id}/status")
     public ResponseEntity<IncidentResponse> updateStatus(
             @PathVariable Long id,

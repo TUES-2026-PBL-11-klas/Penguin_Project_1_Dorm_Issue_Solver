@@ -21,11 +21,9 @@ public class AuthService {
     }
 
     public String register(RegisterRequest request) {
-        // Проверка дали имейлът вече съществува
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Имейлът вече е регистриран!");
         }
-        // Проверка дали username вече съществува
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new RuntimeException("Потребителското име вече е заето!");
         }
@@ -34,14 +32,13 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole()); // "STUDENT" или "ADMINISTRATOR"
+        user.setRole(request.getRole());
 
         userRepository.save(user);
         return "Регистрацията е успешна!";
     }
 
     public AuthResponse login(LoginRequest request) {
-        // Търси по username
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Потребителят не съществува!"));
 

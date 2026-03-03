@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --purple-bright: #9400D3;
+  --purple-dark: #5B0080;
+  --purple-deeper: #3D0060;
+  --white: #ffffff;
+  --text-dark: #111111;
+  --text-muted: #888888;
+  --border: #c084fc;
+  --red: #e07070;
+  --yellow: #e0c850;
+  --green: #5bbf72;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--purple-bright);
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.page-name {
+  text-align: center;
+  padding: 20px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
