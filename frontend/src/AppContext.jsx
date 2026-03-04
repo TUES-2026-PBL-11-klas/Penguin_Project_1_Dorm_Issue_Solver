@@ -2,48 +2,128 @@ import { createContext, useContext, useState } from "react";
 
 const AppContext = createContext(null);
 
-const PRIORITY_ORDER = { HIGH: 0, NORMAL: 1, LOW: 2 };
-const STATUS_ORDER   = { "IN PROGRESS": 0, "NOT STARTED": 1, FINISHED: 2 };
-
-const INITIAL_TASKS = [
-  { id: 1, name: "Broken window in Room 204", priority: "HIGH",   status: "IN PROGRESS", reportedBy: "alice", reportedAt: "09:15", photo: null, description: "The window latch is broken and cannot be closed." },
-  { id: 2, name: "Leaking pipe in bathroom",  priority: "HIGH",   status: "NOT STARTED", reportedBy: "bob",   reportedAt: "10:02", photo: null, description: "Water is dripping from the pipe under sink B2." },
-  { id: 3, name: "Flickering lights hallway", priority: "NORMAL", status: "NOT STARTED", reportedBy: "carol", reportedAt: "11:30", photo: null, description: "Hallway lights on floor 3 keep flickering." },
-  { id: 4, name: "Loose door handle",         priority: "LOW",    status: "FINISHED",    reportedBy: "dave",  reportedAt: "08:45", photo: null, description: "Door handle on room 101 was loose." },
-  { id: 5, name: "Missing ceiling tile",      priority: "LOW",    status: "NOT STARTED", reportedBy: "eve",   reportedAt: "13:00", photo: null, description: "Ceiling tile in corridor B is missing." },
-];
-
-function sortTasks(tasks) {
-  return [...tasks].sort((a, b) => {
-    const pd = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
-    if (pd !== 0) return pd;
-    return STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
-  });
-}
+// Use Vite env if provided, otherwise use relative path so dev proxy works
+const BASE_URL = "http://localhost:8080";
 
 export function AppProvider({ children }) {
   const [role, setRole]   = useState(null);
   const [user, setUser]   = useState(null);
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const [token, setToken] = useState(null);
 
-  const updateTaskStatus = (id, newStatus) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  // Помощна функция – слага токена в хедъра автоматично
+  const authHeaders = () => ({
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  });
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+
+  const login = async (username, password) => {
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Грешно потребителско име или парола");
+    }
+
+    const data = await res.json();
+    setToken(data.token);
+    setUser(data.username);
+    setRole(data.role?.toLowerCase()); // "STUDENT" → "student"
+    return data;
   };
 
-  const addTask = (task) => {
-    setTasks(prev => [...prev, {
-      ...task,
-      id: Date.now(),
-      status: "NOT STARTED",
-      reportedAt: new Date().toTimeString().slice(0, 5),
-    }]);
+  const register = async (email, username, password, role) => {
+    const res = await fetch(`${BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, username, password, role: role.toUpperCase() })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Грешка при регистрация");
+    }
+    const data = await res.json();
+    setToken(data.token);
+    setUser(data.username);
+    setRole(data.role?.toLowerCase());
+    return data;
   };
 
-  const sortedTasks = sortTasks(tasks);
-  const studentTasks = (username) => sortTasks(tasks.filter(t => t.reportedBy === username));
+  // ── Incidents ─────────────────────────────────────────────────────────────
+
+  const getMyIncidents = async () => {
+    const res = await fetch(`${BASE_URL}/api/incidents/my`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Грешка при зареждане на инциденти");
+    return res.json();
+  };
+
+  const getMyStats = async () => {
+    const res = await fetch(`${BASE_URL}/api/incidents/my/stats`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Грешка при зареждане на статистика");
+    return res.json();
+  };
+
+  const getAllIncidents = async () => {
+    const res = await fetch(`${BASE_URL}/api/incidents/admin/all`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Грешка при зареждане на инциденти");
+    return res.json();
+  };
+
+  const getAdminStats = async () => {
+    const res = await fetch(`${BASE_URL}/api/incidents/admin/stats`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Грешка при зареждане на статистика");
+    return res.json();
+  };
+
+  const getIncidentById = async (id) => {
+    const res = await fetch(`${BASE_URL}/api/incidents/${id}`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Инцидентът не е намерен");
+    return res.json();
+  };
+
+  const createIncident = async (formData) => {
+    // formData е FormData обект (защото има снимка)
+    const res = await fetch(`${BASE_URL}/api/incidents`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }, // без Content-Type – браузърът го слага сам
+      body: formData
+    });
+    if (!res.ok) throw new Error("Грешка при създаване на инцидент");
+    return res.json();
+  };
+
+  const updateStatus = async (id, newStatus) => {
+    const res = await fetch(`${BASE_URL}/api/incidents/${id}/status?newStatus=${newStatus}`, {
+      method: "PATCH",
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error("Грешка при промяна на статус");
+    return res.json();
+  };
 
   return (
-    <AppContext.Provider value={{ role, setRole, user, setUser, tasks: sortedTasks, updateTaskStatus, addTask, studentTasks }}>
+    <AppContext.Provider value={{
+      role, user, token,
+      login, register,
+      getMyIncidents, getMyStats,
+      getAllIncidents, getAdminStats,
+      getIncidentById, createIncident, updateStatus
+    }}>
       {children}
     </AppContext.Provider>
   );

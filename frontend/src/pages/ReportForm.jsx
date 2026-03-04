@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useApp } from '../AppContext'
 import './purple-theme.css'
 
-function ReportForm() {
-  const navigate = useNavigate()
+function ReportForm({ onNavigate }) {
+  const { createIncident } = useApp()
   const [formData, setFormData] = useState({
     title: '',
-    priority: 'NORMAL',
+    priority: 'HIGH',
     description: '',
     image: null,
   })
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -20,10 +22,24 @@ function ReportForm() {
     setFormData({ ...formData, image: e.target.files[0] })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Сигнал:', formData)
-    setSubmitted(true)
+    setError(null)
+    setLoading(true)
+    try {
+      const data = new FormData()
+      data.append('title', formData.title)
+      data.append('description', formData.description)
+      data.append('priority', formData.priority)
+      if (formData.image) data.append('image', formData.image)
+
+      await createIncident(data)
+      setSubmitted(true)
+    } catch (err) {
+      setError('Грешка при изпращане на репорта. Опитай отново.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
@@ -33,7 +49,7 @@ function ReportForm() {
           <div className="fs-1">✅</div>
           <h4 className="mt-3 fw-bold">Report submitted!</h4>
           <p className="text-muted">You will be notified when the status changes.</p>
-          <button className="btn-purple mt-3" onClick={() => navigate('/student')}>
+          <button className="btn-purple mt-3" onClick={() => onNavigate('dashboard')}>
             BACK TO DASHBOARD
           </button>
         </div>
@@ -44,13 +60,12 @@ function ReportForm() {
   return (
     <div className="purple-bg min-vh-100 d-flex flex-column">
 
-      {/* Navbar */}
       <nav className="d-flex justify-content-between align-items-center px-5 py-3">
         <span className="text-white fw-bold fs-4">LOGO</span>
         <div className="d-flex gap-4">
           <span className="text-white nav-link-custom">ABOUT US</span>
-          <span className="text-white nav-link-custom cursor-pointer" onClick={() => navigate('/student')}>DASHBOARD</span>
-          <span className="text-white nav-link-custom cursor-pointer" onClick={() => navigate('/')}>HOME PAGE</span>
+          <span className="text-white nav-link-custom cursor-pointer" onClick={() => onNavigate('dashboard')}>DASHBOARD</span>
+          <span className="text-white nav-link-custom cursor-pointer" onClick={() => onNavigate('home')}>HOME PAGE</span>
           <span className="text-white nav-link-custom">CONTACT</span>
         </div>
       </nav>
@@ -58,7 +73,6 @@ function ReportForm() {
       <div className="container-fluid px-5 py-4 position-relative" style={{ zIndex: 1 }}>
         <div className="row g-4">
 
-          {/* Вляво - Снимка */}
           <div className="col-md-7">
             <div className="card-white">
               <h5 className="fw-bold mb-3">Image</h5>
@@ -76,12 +90,10 @@ function ReportForm() {
             </div>
           </div>
 
-          {/* Вдясно - Форма */}
           <div className="col-md-5">
             <div className="card-white h-100 d-flex flex-column justify-content-between">
               <h5 className="fw-bold mb-3">Info about report</h5>
               <form onSubmit={handleSubmit} className="d-flex flex-column gap-3 flex-grow-1">
-                
                 <input
                   type="text"
                   className="form-control"
@@ -103,19 +115,20 @@ function ReportForm() {
                     style={{ background: '#6a00a8', color: 'white', borderRadius: '20px', padding: '4px 12px', cursor: 'pointer' }}
                   >
                     <option value="HIGH">HIGH</option>
-                    <option value="NORMAL">NORMAL</option>
+                    <option value="MEDIUM">MEDIUM</option>
                     <option value="LOW">LOW</option>
                   </select>
                 </div>
 
-                <button type="submit" className="btn-purple mt-auto">
-                  MAKE REPORT
+                {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
+
+                <button type="submit" className="btn-purple mt-auto" disabled={loading}>
+                  {loading ? 'Изпращане...' : 'MAKE REPORT'}
                 </button>
               </form>
             </div>
           </div>
 
-          {/* Долу - Описание */}
           <div className="col-12">
             <div className="card-white">
               <h5 className="fw-bold mb-3">Description</h5>
@@ -123,7 +136,7 @@ function ReportForm() {
                 className="form-control border-0"
                 name="description"
                 rows="4"
-                placeholder="Bleblublublubla"
+                placeholder="Describe the issue..."
                 value={formData.description}
                 onChange={handleChange}
                 style={{ resize: 'none' }}

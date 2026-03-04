@@ -97,12 +97,22 @@ public class IncidentController {
         return ResponseEntity.ok(incidentService.getAdminStats());
     }
 
-    // PATCH /api/incidents/{id}/status – admin сменя статус
     @PatchMapping("/{id}/status")
     public ResponseEntity<IncidentResponse> updateStatus(
             @PathVariable Long id,
-            @RequestParam Status newStatus
+            @RequestParam Status newStatus,
+            Authentication authentication
     ) {
+        // Вземаме ролята на логнатия потребител
+        String role = authentication.getAuthorities()
+                .iterator().next()
+                .getAuthority();
+
+        // Само ROLE_ADMIN може да сменя статус
+        if (!role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).build();
+        }
+
         return ResponseEntity.ok(incidentService.updateStatus(id, newStatus));
-    }
+}
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "./AppContext";
 import "./Admintaskview.css";
 
@@ -9,38 +9,124 @@ const STATUS_OPTIONS = [
   { value: "finished",    label: "FINISHED",    bg: "rgba(0,180,50,0.5)",  border: "#00b432", color: "#fff" },
 ];
 
-export default function Admintaskview({ onNavigate, report }) {
-  const { user } = useApp();
+export default function AdminTaskView({ onNavigate, taskId, report }) {
+  const { user, getIncidentById, updateStatus } = useApp();
 
-  // Report data — use passed prop or fall back to placeholder values
-  const reportData = report || {
+  const [reportData, setReportData] = useState(report || null);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+
+  useEffect(() => {
+    if (!taskId) return;
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await getIncidentById(taskId);
+        if (mounted) setReportData(data);
+      } catch (err) {
+        if (mounted) setLoadError(err.message || String(err));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, [taskId]);
+
+  console.info('AdminTaskView:', { taskId, reportData, loadError });
+
+  const placeholder = {
     title:       "Report Title",
-    imageUrl:    null,          // replace with real image URL
-    description: "Bleblublublubla",
+    imageUrl:    null,
+    description: "No description",
     reportedBy:  "username",
     reportedAt:  "00:00",
     priority:    "Normal",
     status:      "not_started",
   };
+  const rd = reportData || report || placeholder;
+
+  // Map backend enum/status to frontend option value and back
+  const mapBackendToFrontend = (backendStatus) => {
+    if (!backendStatus) return "not_started";
+    const s = String(backendStatus).toUpperCase();
+    if (s === "FINISHED") return "finished";
+    if (s === "IN_PROGRESS") return "in_progress";
+    return "not_started";
+  };
+  const mapFrontendToBackend = (frontendValue) => {
+    switch (frontendValue) {
+      case "finished": return "FINISHED";
+      case "in_progress": return "IN_PROGRESS";
+      default: return "NOT_STARTED";
+    }
+  };
 
   const [selectedStatus, setSelectedStatus] = useState(
-    STATUS_OPTIONS.find(s => s.value === reportData.status) || STATUS_OPTIONS[0]
+    STATUS_OPTIONS.find(s => s.value === (mapBackendToFrontend(rd.status) || "not_started")) || STATUS_OPTIONS[0]
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [finished, setFinished] = useState(reportData.status === "finished");
+  const [finished, setFinished] = useState(mapBackendToFrontend(rd.status) === "finished");
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   const handleStatusSelect = (option) => {
+    const prev = selectedStatus;
     setSelectedStatus(option);
     setDropdownOpen(false);
     if (option.value === "finished") setFinished(true);
+
+    // Persist the change to backend
+    (async () => {
+      if (!rd || !rd.id) return;
+      const backendVal = mapFrontendToBackend(option.value);
+      try {
+        setStatusUpdating(true);
+        const updated = await updateStatus(rd.id, backendVal);
+        setReportData(updated);
+        // reflect the backend canonical status in UI
+        const newFrontend = mapBackendToFrontend(updated.status);
+        const newOption = STATUS_OPTIONS.find(s => s.value === newFrontend) || option;
+        setSelectedStatus(newOption);
+        setFinished(newFrontend === "finished");
+      } catch (err) {
+        console.error('Failed to update status', err);
+        // revert selection on error
+        setSelectedStatus(prev);
+      } finally {
+        setStatusUpdating(false);
+      }
+    })();
   };
 
   const handleMarkFinished = () => {
     const finishedOption = STATUS_OPTIONS.find(s => s.value === "finished");
-    setSelectedStatus(finishedOption);
-    setFinished(true);
-    // TODO: call your API here to persist the status change
+    if (!rd || !rd.id) {
+      setSelectedStatus(finishedOption);
+      setFinished(true);
+      return;
+    }
+    (async () => {
+      try {
+        setStatusUpdating(true);
+        const updated = await updateStatus(rd.id, mapFrontendToBackend(finishedOption.value));
+        setReportData(updated);
+        setSelectedStatus(finishedOption);
+        setFinished(true);
+      } catch (err) {
+        console.error('Failed to mark finished', err);
+      } finally {
+        setStatusUpdating(false);
+      }
+    })();
   };
+
+  if (loading) return (
+    <div className="atv-page"><nav className="atv-nav"><span className="atv-nav-logo">LOGO</span></nav><main className="atv-main" style={{padding:40}}>Loading...</main></div>
+  );
+  if (loadError) return (
+    <div className="atv-page"><nav className="atv-nav"><span className="atv-nav-logo">LOGO</span></nav><main className="atv-main" style={{padding:40}}>Error: {loadError}</main></div>
+  );
 
   return (
     <div className="atv-page">
@@ -71,8 +157,8 @@ export default function Admintaskview({ onNavigate, report }) {
             <h2 className="atv-card-title">Image</h2>
             <div className="atv-image-placeholder">
               {/* Replace with real report image when available */}
-              {reportData.imageUrl
-                ? <img src={reportData.imageUrl} alt="Report" className="atv-image-real" />
+              {rd.imageUrl
+                ? <img src={rd.imageUrl} alt="Report" className="atv-image-real" />
                 : null
               }
             </div>
@@ -84,13 +170,13 @@ export default function Admintaskview({ onNavigate, report }) {
 
             <div className="atv-info-fields">
               <p className="atv-info-line">
-                Reported by: <strong>{reportData.reportedBy}</strong>
+                Reported by: <strong>{rd.studentName || rd.reportedBy}</strong>
               </p>
               <p className="atv-info-line">
-                Reported at: <strong>{reportData.reportedAt}</strong>
+                Reported at: <strong>{rd.createdAt || rd.reportedAt}</strong>
               </p>
               <p className="atv-info-line">
-                Priority: <strong>{reportData.priority}</strong>
+                Priority: <strong>{rd.priority}</strong>
               </p>
             </div>
 
@@ -156,7 +242,7 @@ export default function Admintaskview({ onNavigate, report }) {
         {/* ── Description card (full width) ── */}
         <div className="atv-card atv-description-card">
           <h2 className="atv-card-title">Description</h2>
-          <p className="atv-description-text">{reportData.description}</p>
+          <p className="atv-description-text">{rd.description}</p>
         </div>
 
       </main>

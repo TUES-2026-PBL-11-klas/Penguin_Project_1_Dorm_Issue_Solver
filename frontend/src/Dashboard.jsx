@@ -1,13 +1,15 @@
-import { useState } from "react";
 import AvatarIcon from "./AvatarIcon";
 import { useApp } from "./AppContext";
 import "./Dashboard.css";
+import { useState, useEffect } from "react";
 
 // ─── Badge config ──────────────────────────────────────────────────────────────
 
 const PRIORITY_CONFIG = {
   high:   { label: "HIGH",   bg: "rgba(149,0,173,0.8)", border: "#9500ad", color: "#fff" },
   normal: { label: "NORMAL", bg: "rgba(102,0,123,0.8)", border: "#66007b", color: "#fff" },
+  // backend/form can send "MEDIUM" or "medium" — treat as normal
+  medium: { label: "MEDIUM", bg: "rgba(102,0,123,0.8)", border: "#66007b", color: "#fff" },
   low:    { label: "LOW",    bg: "rgba(64,1,81,0.8)",   border: "#400151", color: "#fff" },
 };
 
@@ -15,6 +17,19 @@ const STATUS_CONFIG = {
   in_progress:  { label: "IN PROGRESS",  bg: "rgba(255,226,5,0.5)",  border: "#ffe205", color: "#000" },
   not_started:  { label: "NOT STARTED",  bg: "rgba(189,0,0,0.5)",    border: "#bd0000", color: "#fff" },
   finished:     { label: "FINISHED",     bg: "rgba(0,180,50,0.5)",   border: "#00b432", color: "#fff" },
+};
+
+// Sort helper: high -> medium/normal -> low
+const sortByPriority = (arr) => {
+  if (!Array.isArray(arr)) return arr || [];
+  const rank = (p) => {
+    if (!p) return 3;
+    const v = String(p).toLowerCase();
+    if (v.includes("high")) return 0;
+    if (v.includes("medium") || v.includes("normal")) return 1;
+    return 2;
+  };
+  return arr.slice().sort((a, b) => rank(a.priority) - rank(b.priority));
 };
 
 // ─── Sample data — replace with real API data ──────────────────────────────────
@@ -27,10 +42,9 @@ const SAMPLE_REPORTS = [
 ];
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
-
 function ReportRow({ report, onRowClick }) {
-  const priority = PRIORITY_CONFIG[report.priority] || PRIORITY_CONFIG.low;
-  const status   = STATUS_CONFIG[report.status]     || STATUS_CONFIG.not_started;
+  const priority = PRIORITY_CONFIG[report.priority?.toLowerCase()] || PRIORITY_CONFIG.low;
+  const status   = STATUS_CONFIG[report.status?.toLowerCase()] || STATUS_CONFIG.not_started;
   return (
     <div
       className="db-report-row"
@@ -56,36 +70,58 @@ function ReportRow({ report, onRowClick }) {
   );
 }
 
+
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
+
+
 export default function Dashboard({ onNavigate }) {
-  const { user, role } = useApp();
+  const { user, role, getMyIncidents, getMyStats, getAllIncidents, getAdminStats } = useApp();
   const isAdmin = role === "admin";
 
-  // Replace with real data from your API/context
-  const [reports] = useState(SAMPLE_REPORTS);
+  const [reports, setReports] = useState([]);
+  const [stats, setStats]     = useState({ totalIncidents: 0, notStarted: 0, inProgress: 0, finished: 0 });
 
-  const notStartedCount = reports.filter(r => r.status === "not_started").length;
-  const inProgressCount = reports.filter(r => r.status === "in_progress").length;
-  const finishedCount   = reports.filter(r => r.status === "finished").length;
+  useEffect(() => {
+    const load = async () => {
+      try {
+        if (isAdmin) {
+          const [data, s] = await Promise.all([getAllIncidents(), getAdminStats()]);
+          setReports(sortByPriority(data));
+          setStats(s);
+        } else {
+          const [data, s] = await Promise.all([getMyIncidents(), getMyStats()]);
+          setReports(sortByPriority(data));
+          setStats(s);
+        }
+      } catch (err) {
+        console.error("Грешка при зареждане:", err);
+      }
+    };
+    load();
+  }, []);
+
+  const notStartedCount = stats.notStarted;
+  const inProgressCount = stats.inProgress;
+  const finishedCount   = stats.finished;
 
   const handleReportClick = (report) => {
-    // Navigate to the appropriate singular task view
-    // TODO: pass the selected report id/data to the task view via context or state
-    if (isAdmin) {
-      onNavigate && onNavigate("admintask");
-    } else {
-      onNavigate && onNavigate("studenttask");
-    }
-  };
+  console.info('Dashboard.reportClick ->', { id: report.id, isAdmin });
+  if (isAdmin) {
+    onNavigate && onNavigate("admintask", report.id);
+  } else {
+    onNavigate && onNavigate("studenttask", report.id);
+  }
+};
 
   const handleActionBtn = () => {
-    if (isAdmin) {
-      onNavigate && onNavigate("allreports");
-    } else {
-      onNavigate && onNavigate("newreport");
-    }
-  };
+  if (isAdmin) {
+    onNavigate && onNavigate("dashboard"); // засега няма отделна страница
+  } else {
+    // Navigate to the Bootstrap-based ReportForm page
+    onNavigate && onNavigate("newreport");
+  }
+};
 
   return (
     <div className="db-page">

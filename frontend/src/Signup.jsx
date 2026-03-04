@@ -4,23 +4,30 @@ import { useApp } from "./AppContext";
 import "./Signup.css";
 
 export default function Signup({ onNavigate }) {
-  const { setRole, setUser } = useApp();
-  const [form, setForm] = useState({ email: "", username: "", password: "" });
+  const { register } = useApp();
+  const [form, setForm]       = useState({ email: "", username: "", password: "" });
   const [selectedRole, setSelectedRole] = useState("student");
+  const [error, setError]     = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSignup = () => {
-    setRole(selectedRole);
-    setUser(form.username || (selectedRole === "admin" ? "Admin" : "Student"));
-    onNavigate("dashboard");
+  const handleSignup = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await register(form.email, form.username, form.password, selectedRole);
+      onNavigate("dashboard");
+    } catch (err) {
+      setError("Грешка при регистрация. Опитай отново.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="signup-page">
-
       <div className="signup-card">
-
         <h1 className="signup-title">Sign Up</h1>
 
         <div className="signup-avatar">
@@ -72,19 +79,18 @@ export default function Signup({ onNavigate }) {
           </button>
         </div>
 
-        <button className="signup-submit-btn" onClick={handleSignup}>
-          LOG IN
+        {error && <p style={{ color: "red", fontSize: "14px" }}>{error}</p>}
+
+        <button className="signup-submit-btn" onClick={handleSignup} disabled={loading}>
+          {loading ? "Loading..." : "SIGN UP"}
         </button>
 
         <p className="signup-auth-switch">
           Already have an account?{" "}
           <span onClick={() => onNavigate("login")}>Log in</span>
         </p>
-
       </div>
-
       <p className="signup-footer-name">Name</p>
-
     </div>
   );
 }
